@@ -1,54 +1,48 @@
 import shioaji as sj
+from shioaji.constant import Action, StockPriceType, OrderType
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
-api = sj.Shioaji(simulation=True) # 模擬模式
-accounts = api.login(
-    api_key=os.getenv('API_KEY'),
-    secret_key=os.getenv('SECRET_KEY')  
-)
-accounts
+def testing_stock_ordering():
+    # 測試環境登入
+    api = sj.Shioaji(simulation=True)
+    accounts = api.login(
+        api_key=os.environ["API_KEY"],
+        secret_key=os.environ["SECRET_KEY"]
+    )
+    # 顯示所有可用的帳戶
+    print(f"Available accounts: {accounts}")
+    api.activate_ca(
+        ca_path=os.environ["CA_CERT_PATH"],
+        ca_passwd=os.environ["CA_PASSWORD"],
+    )
 
-# 商品檔 - 請修改此處
-contract = api.Contracts.Stocks.TSE["0050"]
+    # 準備下單的 Contract
+    # 使用 2890 永豐金為例
+    contract = api.Contracts.Stocks["2890"]
+    print(f"Contract: {contract}")
 
-# 證券委託單 - 請修改此處
-order = api.Order(
-    price=18,                                       # 價格
-    quantity=1,                                     # 數量
-    action=sj.constant.Action.Buy,                  # 買賣別
-    price_type=sj.constant.StockPriceType.LMT,      # 委託價格類別
-    order_type=sj.constant.OrderType.ROD,           # 委託條件
-    account=api.stock_account                       # 下單帳號
-)
+    # 建立委託下單的 Order
+    order = sj.order.StockOrder(
+        action=Action.Buy, # 買進
+        price=contract.reference, # 以平盤價買進
+        quantity=1, # 下單數量
+        price_type=StockPriceType.LMT, # 限價單
+        order_type=OrderType.ROD, # 當日有效單
+        account=api.stock_account, # 使用預設的帳戶
+    )
+    print(f"Order: {order}")
 
-# 下單
-trade = api.place_order(contract, order)
-trade
+    # 送出委託單
+    trade = api.place_order(contract=contract, order=order)
+    print(f"Trade: {trade}")
 
-# 商品檔 - 近月台指期貨, 請修改此處
-contract = min(
-    [
-        x for x in api.Contracts.Futures.TXF 
-        if x.code[-2:] not in ["R1", "R2"]
-    ],
-    key=lambda x: x.delivery_date
-)
+    # 更新狀態
+    api.update_status()
+    print(f"Status: {trade.status}")
 
-# 期貨委託單 - 請修改此處
-order = api.Order(
-    action=sj.constant.Action.Buy,                   # 買賣別
-    price=15000,                                     # 價格
-    quantity=1,                                      # 數量
-    price_type=sj.constant.FuturesPriceType.LMT,     # 委託價格類別
-    order_type=sj.constant.OrderType.ROD,            # 委託條件
-    octype=sj.constant.FuturesOCType.Auto,           # 倉別
-    account=api.futopt_account                       # 下單帳號
-)
-
-# 下單
-trade = api.place_order(contract, order)
-
-
+if __name__== '__main__':
+    testing_stock_ordering()

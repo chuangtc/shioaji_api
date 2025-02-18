@@ -6,11 +6,12 @@ Shiaoji SinoPac 永豐金證券 Python API
 
 ## Requirements
 * python >= 3.8
-* Shioaji v1.1.3 (2023-05-03)
+* Shioaji v1.2.5 (2025-02-19)
 
 ## Install required packages
 ```bash
 pip install  -r requirements.txt
+pip install shioaji[speed]
 ```
 
 ## Modify .env file
