@@ -5,7 +5,7 @@ Shiaoji SinoPac 永豐金證券 Python API
 * <https://github.com/chuangtc/shioaji_api>
 
 ## Requirements
-* python >= 3.8
+* python >= 3.9
 * Shioaji v1.2.5 (2025-02-19)
 
 ## Install required packages
@@ -37,7 +37,7 @@ Response Code: 0 | Event Code: 0 | Info: host '203.66.91.161:80', hostname '203.
 
 ## 要正式下單時記得CA憑證路徑要用斜線(/)
 ```bash
-CA_PATH="C:/ekey/123/F12345678/S/Sinopac.pfx"
+CA_CERT_PATH="C:/ekey/1234/Sinopac.pfx"
 ```
 
 ## Reference
